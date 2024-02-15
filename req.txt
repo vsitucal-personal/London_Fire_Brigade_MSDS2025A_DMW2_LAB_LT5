@@ -1,3 +1,6 @@
 pandas
 matplotlib
 scikit-learn
+scikit-learn-extra
+plotly
+jupyterlab_execute_time

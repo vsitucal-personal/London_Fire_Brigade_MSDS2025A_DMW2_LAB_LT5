@@ -24,8 +24,8 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 import plotly.express as px
 import plotly.graph_objects as go
 from sklearn.cluster import KMeans
+from sklearn_extra.cluster import KMedoids
 from IPython.display import display
-
 
 
 def pooled_within_ssd(X, y, centroids, dist):
@@ -330,7 +330,8 @@ def plot_internal(ax, inertias, chs, scs, dbs, gss, gssds):
     ax2.plot(ks, dbs, "-gs", label="DB")
     ax2.set_ylabel("Gap statistic/Silhouette/DB")
     lines2, labels2 = ax2.get_legend_handles_labels()
-    ax2.legend(lines + lines2, labels + labels2)
+    ax2.legend(lines + lines2, labels + labels2, loc='center left', bbox_to_anchor=(1.15, 0.5))
+    # ax2.legend(lines + lines2, labels + labels2, )
     return ax
 
 
@@ -481,18 +482,65 @@ def kmeans_proper(combs, pca, n_clusters, df, reduced_df):
     ax.set_xlabel('Principal Component 1')
     ax.set_ylabel('Principal Component 2')
     ax.set_zlabel('Principal Component 3')
-    ax.set_title('KMeans Clustering in 3D')
+    ax.set_title('K-Means Clustering in 3D')
     fig.colorbar(scatter, ax=ax, label='Cluster', pad=0.2)
     plt.show()
 
     return kmeans
 
 
+def kmed_proper(combs, pca, n_clusters, df, reduced_df):
+    kmed = KMedoids(n_clusters=n_clusters,  method="pam", random_state=1337)
+    y_predict = kmed.fit_predict(df.values)
+
+    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(15, 5))
+
+    for i, comb in enumerate(combs):
+        ax = axs[i] if len(combs) > 1 else axs
+        ax.scatter(reduced_df[:, comb[0] - 1], reduced_df[:, comb[1] - 1], c=y_predict)
+        kmeans_new = pca.transform(kmed.cluster_centers_)
+        scatter = ax.scatter(
+            kmeans_new[:, comb[0] - 1],
+            kmeans_new[:, comb[1] - 1],
+            s=60,
+            c=range(kmed.n_clusters),
+            marker="s",
+            ec="k",
+            lw=2,
+        )
+        ax.set_title(f"Scatter Plot of K-Medoids PC{comb[0]}-PC{comb[1]} view")
+        ax.set_xlabel(f"PC {comb[0]}")
+        ax.set_ylabel(f"PC {comb[1]}")
+
+        legend1 = ax.legend(
+            *scatter.legend_elements(),
+            title="Cluster Labels",
+            loc="upper right"
+        )
+        ax.add_artist(legend1)
+
+    plt.tight_layout()  # Adjust layout to prevent overlap
+    plt.show()
+
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111, projection='3d')
+    scatter = ax.scatter(*zip(*reduced_df), c=y_predict)
+    ax.set_xlabel('Principal Component 1')
+    ax.set_ylabel('Principal Component 2')
+    ax.set_zlabel('Principal Component 3')
+    ax.set_title('K-Medoids Clustering in 3D')
+    fig.colorbar(scatter, ax=ax, label='Cluster', pad=0.2)
+    plt.show()
+
+    return kmed
+
+
 def print_cluster_metrics(n_cluster, to_label, local_auth_list, local_auth, cluster_type):
-    print(125*"=")
+    # print(125*"=")
     print(f"cluster {n_cluster}")
     df_cluster = to_label[to_label[cluster_type] == n_cluster]
-    display(df_cluster.info())
+    # display(df_cluster.info()
+
     display(df_cluster[
         [
             'first_pump_time', 'second_pump_time', 'num_of_station_pumps',
@@ -500,11 +548,8 @@ def print_cluster_metrics(n_cluster, to_label, local_auth_list, local_auth, clus
             'notional_cost', 'num_calls'
         ]
     ].describe())
-    print(f"\n")
     display(df_cluster['PropertyCategory'].value_counts().head(5))
-    print(f"\n")
     display(df_cluster['PropertyType'].value_counts().head(5))
-    print(f"\n")
     display(df_cluster['borough'].value_counts().head(5))
 
     choro_incident_counts(df_cluster, local_auth_list, local_auth)
@@ -516,7 +561,7 @@ def print_cluster_metrics(n_cluster, to_label, local_auth_list, local_auth, clus
     print(f"Second percent coming from main station {second_from_main_station*100:.2f}%")
 
     print(125*"=")
-    print(f"\n\n\n")
+    print(f"\n")
 
 
 def prep_data_for_clustering(conn, filter_, suffix, save):
