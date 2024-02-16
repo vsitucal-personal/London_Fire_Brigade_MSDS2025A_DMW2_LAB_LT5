@@ -15,6 +15,9 @@ pip install -r req.txt
 Download lfb.db and put it in your directory:
 https://drive.google.com/file/d/1ht4k4X6CA783X2Un-42USxAF50qF-iL4/view?usp=sharing
 
+Download london borough shape file and unzip in your directory:
+https://drive.google.com/file/d/18zYmNzpgD3NPrdHDjTmFmjzmr91yx6Ed/view?usp=sharing
+
 # Starting Up Jupyterlab
 ```commandline
 jupyter lab

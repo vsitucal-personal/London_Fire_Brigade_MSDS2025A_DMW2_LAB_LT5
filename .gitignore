@@ -164,3 +164,8 @@ cython_debug/
 *Vincent.ipynb
 *Copy1.ipynb
 *.html
+*.shp
+*.cpg
+*.dbf
+*.prj
+*.shx

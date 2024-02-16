@@ -372,6 +372,27 @@ def heirarch_cluster(combs, type_, dist_, df, df_reduced):
     return cluster_labels
 
 
+def choro_incident_counts_gpds(df_cluster, df_boroughs, plot_list):
+    df_b = df_boroughs.copy()
+    choro_df = df_cluster['borough'].value_counts().to_frame().reset_index()
+    choro_df['borough'] = choro_df['borough'].str.lower()
+
+    for index, row in df_b.iterrows():
+        for index_, row_ in choro_df.iterrows():
+            if row_['borough'] in row['DISTRICT']:
+                df_b.loc[index, 'count'] = row_['count']
+    df_b.fillna(0)
+    # display(df_b)
+        
+    # fig, ax = plt.subplots(1, figsize=(8, 8))
+    plot_list.append(df_b)
+    # df_b.plot(column='count', cmap='Reds', legend=True, ax=ax, edgecolor='black')
+    # ax.axis('off')
+    # # df_b.apply(
+    # #     lambda x: ax.annotate(text=x['DISTRICT'], xy=x.geometry.centroid.coords[0], ha='center', fontsize=7), axis=1)
+    # fig.show()
+
+
 def choro_incident_counts(df_cluster, local_auth_list, local_auth):
     choro_df = df_cluster['borough'].value_counts().reset_index()
     choro_df['borough'] = choro_df['borough'].map(
@@ -401,6 +422,27 @@ def choro_incident_counts(df_cluster, local_auth_list, local_auth):
     )
     fig.update_layout(height=420, width=420, margin={"r": 0, "t": 0, "l": 0, "b": 0})
     fig.show()
+    # import plotly.graph_objects as go
+    #
+    # fig = go.Figure(go.Choroplethmapbox(
+    #     geojson=local_auth,
+    #     locations=choro_df['LA'],
+    #     z=choro_df['Val'],
+    #     featureidkey="properties.LAD21NM",
+    #     colorscale="Reds",
+    #     colorbar=dict(title='Value'),
+    #     marker_line_width=0,
+    # ))
+    #
+    # fig.update_layout(
+    #     height=420, width=420,
+    #     mapbox=dict(
+    #         style="carto-positron",
+    #         center=dict(lat=51.4399, lon=-0.0943),
+    #         zoom=8,
+    #     )
+    # )
+    # fig.show()
 
 
 def choro_financial(sheet_name, london_boroughs):
@@ -536,7 +578,7 @@ def kmed_proper(combs, pca, n_clusters, df, reduced_df):
 
 def print_cluster_metrics(
     n_cluster, to_label, local_auth_list, local_auth, cluster_type, stats_summary_list,
-    cat_summary_list,
+    cat_summary_list, use_gpds, df_boroughs, plot_list,
 ):
     # print(125*"=")
     print(f"cluster {n_cluster}")
@@ -561,7 +603,12 @@ def print_cluster_metrics(
     cat_df = pd.concat([dpc, dpt, db], axis=1)
     cat_df.index = pd.MultiIndex.from_product([[f"Cluster {n_cluster}"], cat_df.index])
     cat_summary_list.append(cat_df)
-    choro_incident_counts(df_cluster, local_auth_list, local_auth)
+
+    if use_gpds:
+        choro_incident_counts_gpds(df_cluster, df_boroughs, plot_list)
+    else:
+        choro_incident_counts(df_cluster, local_auth_list, local_auth)
+
     first_from_main_station = len(df_cluster[df_cluster['IncidentStationGround'] == df_cluster['FirstPumpArriving_DeployedFromStation']]) \
         / df_cluster['FirstPumpArriving_DeployedFromStation'].count()
     second_from_main_station = len(df_cluster[df_cluster['IncidentStationGround'] == df_cluster['SecondPumpArriving_DeployedFromStation']]) \
