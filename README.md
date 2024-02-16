@@ -8,6 +8,7 @@ https://www.python.org/downloads/
 - Setup environment in directory
 ```commandline
 python -m venv venv
+venv/Scripts/activate
 pip install jupyter
 pip install -r req.txt
 ```
