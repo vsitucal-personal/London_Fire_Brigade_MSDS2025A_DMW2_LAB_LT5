@@ -383,7 +383,7 @@ def choro_incident_counts_gpds(df_cluster, df_boroughs, plot_list):
                 df_b.loc[index, 'count'] = row_['count']
     df_b.fillna(0)
     # display(df_b)
-        
+
     # fig, ax = plt.subplots(1, figsize=(8, 8))
     plot_list.append(df_b)
     # df_b.plot(column='count', cmap='Reds', legend=True, ax=ax, edgecolor='black')
@@ -581,7 +581,7 @@ def print_cluster_metrics(
     cat_summary_list, use_gpds, df_boroughs, plot_list,
 ):
     # print(125*"=")
-    print(f"cluster {n_cluster}")
+    # print(f"cluster {n_cluster}")
     df_cluster = to_label[to_label[cluster_type] == n_cluster]
     # display(df_cluster.info()
 
@@ -613,9 +613,9 @@ def print_cluster_metrics(
         / df_cluster['FirstPumpArriving_DeployedFromStation'].count()
     second_from_main_station = len(df_cluster[df_cluster['IncidentStationGround'] == df_cluster['SecondPumpArriving_DeployedFromStation']]) \
         / df_cluster['SecondPumpArriving_DeployedFromStation'].count()
-    print(f"\nFirst percent coming from main station {first_from_main_station*100:.2f}%")
-    print(f"Second percent coming from main station {second_from_main_station*100:.2f}%")
-    print(125*"=")
+    # print(f"\nFirst percent coming from main station {first_from_main_station*100:.2f}%")
+    # print(f"Second percent coming from main station {second_from_main_station*100:.2f}%")
+    # print(125*"=")
 
 
 def prep_data_for_clustering(conn, filter_, suffix, save):
