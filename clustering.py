@@ -351,7 +351,7 @@ def heirarch_cluster(combs, type_, dist_, df, df_reduced):
     )
     cluster_labels = agg.fit_predict(df)
 
-    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(15, 5))
+    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(12, 4))
     for i, comb in enumerate(combs):
         ax = axs[i] if len(combs) > 1 else axs
         ax.scatter(
@@ -399,9 +399,8 @@ def choro_incident_counts(df_cluster, local_auth_list, local_auth):
         zoom=8,
         labels={'val': 'value'},
     )
-    fig.update_layout(height=420, width=420, margin={"r": 0, "t": 0, "l": 0, "b": 0}, dragmode=False)
+    fig.update_layout(height=420, width=420, margin={"r": 0, "t": 0, "l": 0, "b": 0})
     fig.show()
-    # pyo.plot(fig)
 
 
 def choro_financial(sheet_name, london_boroughs):
@@ -447,7 +446,7 @@ def kmeans_proper(combs, pca, n_clusters, df, reduced_df):
     kmeans = KMeans(n_clusters=n_clusters, random_state=1337, n_init='auto')
     y_predict = kmeans.fit_predict(df.values)
 
-    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(13, 3))
+    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(12, 4))
 
     for i, comb in enumerate(combs):
         ax = axs[i] if len(combs) > 1 else axs
@@ -476,7 +475,7 @@ def kmeans_proper(combs, pca, n_clusters, df, reduced_df):
     plt.tight_layout()  # Adjust layout to prevent overlap
     plt.show()
 
-    fig = plt.figure(figsize=(6, 4))
+    fig = plt.figure(figsize=(7, 5))
     ax = fig.add_subplot(111, projection='3d')
     scatter = ax.scatter(*zip(*reduced_df), c=y_predict)
     ax.set_xlabel('Principal Component 1')
@@ -629,7 +628,7 @@ def prep_data_for_clustering(conn, filter_, suffix, save):
 
 
 def display_pca_views(combs, df_reduced, cluster_labels):
-    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(12, 3))
+    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(12, 4))
 
     for i, comb in enumerate(combs):
         ax = axs[i] if len(combs) > 1 else axs
