@@ -26,7 +26,7 @@ import plotly.graph_objects as go
 from sklearn.cluster import KMeans
 from sklearn_extra.cluster import KMedoids
 from IPython.display import display
-
+import plotly.offline as pyo
 
 def pooled_within_ssd(X, y, centroids, dist):
     """Compute pooled within-cluster sum of squares around the cluster mean
@@ -386,22 +386,22 @@ def choro_incident_counts(df_cluster, local_auth_list, local_auth):
             new_index = len(choro_df)
             choro_df.loc[new_index] = new_row
 
+    # choropleth_mapbox
     fig = px.choropleth_mapbox(
         choro_df,
         geojson=local_auth,
         locations='LA',
         color='Val',
         featureidkey="properties.LAD21NM",
-        color_continuous_scale="Viridis",
+        color_continuous_scale="Inferno",
         mapbox_style="carto-positron",
-        center={"lat": 51.5072, "lon": 0.1276},
-        zoom=8.4,
+        center={"lat": 51.4399, "lon": -0.0943},
+        zoom=8,
         labels={'val': 'value'},
-
     )
-
-    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+    fig.update_layout(height=420, width=420, margin={"r": 0, "t": 0, "l": 0, "b": 0}, dragmode=False)
     fig.show()
+    # pyo.plot(fig)
 
 
 def choro_financial(sheet_name, london_boroughs):
@@ -447,7 +447,7 @@ def kmeans_proper(combs, pca, n_clusters, df, reduced_df):
     kmeans = KMeans(n_clusters=n_clusters, random_state=1337, n_init='auto')
     y_predict = kmeans.fit_predict(df.values)
 
-    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(15, 5))
+    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(13, 3))
 
     for i, comb in enumerate(combs):
         ax = axs[i] if len(combs) > 1 else axs
@@ -476,7 +476,7 @@ def kmeans_proper(combs, pca, n_clusters, df, reduced_df):
     plt.tight_layout()  # Adjust layout to prevent overlap
     plt.show()
 
-    fig = plt.figure(figsize=(8, 6))
+    fig = plt.figure(figsize=(6, 4))
     ax = fig.add_subplot(111, projection='3d')
     scatter = ax.scatter(*zip(*reduced_df), c=y_predict)
     ax.set_xlabel('Principal Component 1')
@@ -493,7 +493,7 @@ def kmed_proper(combs, pca, n_clusters, df, reduced_df):
     kmed = KMedoids(n_clusters=n_clusters,  method="pam", random_state=1337)
     y_predict = kmed.fit_predict(df.values)
 
-    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(15, 5))
+    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(12, 3))
 
     for i, comb in enumerate(combs):
         ax = axs[i] if len(combs) > 1 else axs
@@ -522,7 +522,7 @@ def kmed_proper(combs, pca, n_clusters, df, reduced_df):
     plt.tight_layout()  # Adjust layout to prevent overlap
     plt.show()
 
-    fig = plt.figure(figsize=(8, 6))
+    fig = plt.figure(figsize=(6, 4))
     ax = fig.add_subplot(111, projection='3d')
     scatter = ax.scatter(*zip(*reduced_df), c=y_predict)
     ax.set_xlabel('Principal Component 1')
@@ -535,33 +535,41 @@ def kmed_proper(combs, pca, n_clusters, df, reduced_df):
     return kmed
 
 
-def print_cluster_metrics(n_cluster, to_label, local_auth_list, local_auth, cluster_type):
+def print_cluster_metrics(
+    n_cluster, to_label, local_auth_list, local_auth, cluster_type, stats_summary_list,
+    cat_summary_list,
+):
     # print(125*"=")
     print(f"cluster {n_cluster}")
     df_cluster = to_label[to_label[cluster_type] == n_cluster]
     # display(df_cluster.info()
 
-    display(df_cluster[
+    stats_df = df_cluster[
         [
             'first_pump_time', 'second_pump_time', 'num_of_station_pumps',
             'num_pumps', 'pump_cnt', 'pump_hrs_rnd_up',
             'notional_cost', 'num_calls'
         ]
-    ].describe())
-    display(df_cluster['PropertyCategory'].value_counts().head(5))
-    display(df_cluster['PropertyType'].value_counts().head(5))
-    display(df_cluster['borough'].value_counts().head(5))
+    ].describe()
+    stats_df.drop(['25%', '50%', '75%'], axis=0, inplace=True)
+    stats_df.index = pd.MultiIndex.from_product([[f"Cluster {n_cluster}"], stats_df.index])
+    stats_summary_list.append(stats_df)
 
+    # display(stats_df)
+    dpc = df_cluster[['PropertyCategory']].value_counts().to_frame('counts').reset_index().head(5)
+    dpt = df_cluster['PropertyType'].value_counts().to_frame('counts').reset_index().head(5)
+    db = df_cluster['borough'].value_counts().to_frame('counts').reset_index().head(5)
+    cat_df = pd.concat([dpc, dpt, db], axis=1)
+    cat_df.index = pd.MultiIndex.from_product([[f"Cluster {n_cluster}"], cat_df.index])
+    cat_summary_list.append(cat_df)
     choro_incident_counts(df_cluster, local_auth_list, local_auth)
     first_from_main_station = len(df_cluster[df_cluster['IncidentStationGround'] == df_cluster['FirstPumpArriving_DeployedFromStation']]) \
         / df_cluster['FirstPumpArriving_DeployedFromStation'].count()
     second_from_main_station = len(df_cluster[df_cluster['IncidentStationGround'] == df_cluster['SecondPumpArriving_DeployedFromStation']]) \
         / df_cluster['SecondPumpArriving_DeployedFromStation'].count()
-    print(f"First percent coming from main station {first_from_main_station*100:.2f}%")
+    print(f"\nFirst percent coming from main station {first_from_main_station*100:.2f}%")
     print(f"Second percent coming from main station {second_from_main_station*100:.2f}%")
-
     print(125*"=")
-    print(f"\n")
 
 
 def prep_data_for_clustering(conn, filter_, suffix, save):
@@ -621,7 +629,7 @@ def prep_data_for_clustering(conn, filter_, suffix, save):
 
 
 def display_pca_views(combs, df_reduced, cluster_labels):
-    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(15, 5))
+    fig, axs = plt.subplots(nrows=1, ncols=len(combs), figsize=(12, 3))
 
     for i, comb in enumerate(combs):
         ax = axs[i] if len(combs) > 1 else axs
@@ -635,3 +643,7 @@ def display_pca_views(combs, df_reduced, cluster_labels):
 
     plt.tight_layout()
     plt.show()
+
+
+def format_with_commas(x):
+    return '{:,.2f}'.format(x)

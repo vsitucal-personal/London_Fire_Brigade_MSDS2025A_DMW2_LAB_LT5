@@ -160,7 +160,7 @@ cython_debug/
 #.idea/
 
 *.db
-.csv
+*.csv
 *Vincent.ipynb
 *Copy1.ipynb
-.html
+*.html
