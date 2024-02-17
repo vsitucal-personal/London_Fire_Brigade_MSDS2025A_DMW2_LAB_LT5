@@ -578,7 +578,7 @@ def kmed_proper(combs, pca, n_clusters, df, reduced_df):
 
 def print_cluster_metrics(
     n_cluster, to_label, local_auth_list, local_auth, cluster_type, stats_summary_list,
-    cat_summary_list, use_gpds, df_boroughs, plot_list,
+    cat_summary_list, use_gpds, df_boroughs, plot_list, cluster_metrics_to_investigate
 ):
     # print(125*"=")
     # print(f"cluster {n_cluster}")
@@ -586,11 +586,7 @@ def print_cluster_metrics(
     # display(df_cluster.info()
 
     stats_df = df_cluster[
-        [
-            'first_pump_time', 'second_pump_time', 'num_of_station_pumps',
-            'num_pumps', 'pump_cnt', 'pump_hrs_rnd_up',
-            'notional_cost', 'num_calls'
-        ]
+        cluster_metrics_to_investigate
     ].describe()
     stats_df.drop(['25%', '50%', '75%'], axis=0, inplace=True)
     stats_df.index = pd.MultiIndex.from_product([[f"Cluster {n_cluster}"], stats_df.index])
