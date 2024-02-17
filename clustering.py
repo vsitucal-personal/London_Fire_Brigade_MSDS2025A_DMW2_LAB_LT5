@@ -273,7 +273,7 @@ def plot_clusters2(
 ):
     """Plot clusters given the design matrix and cluster labels"""
     for comb, figsize in zip(combs, figsizes):
-        display(Markdown(f"##### PC{comb[0]}-PC{comb[1]}"))
+        display(Markdown(f"##### PC{comb[0]}-PC{comb[1]} view"))
         k_max = len(ys) + 1
         k_mid = k_max//2 + 2
         fig, ax = plt.subplots(2, k_max//2, squeeze=squeeze, dpi=dpi, sharex=sharex, sharey=sharey,
