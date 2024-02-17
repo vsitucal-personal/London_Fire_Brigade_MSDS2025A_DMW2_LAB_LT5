@@ -25,7 +25,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from sklearn.cluster import KMeans
 from sklearn_extra.cluster import KMedoids
-from IPython.display import display
+from IPython.display import display, Markdown
 import plotly.offline as pyo
 
 def pooled_within_ssd(X, y, centroids, dist):
@@ -273,7 +273,7 @@ def plot_clusters2(
 ):
     """Plot clusters given the design matrix and cluster labels"""
     for comb, figsize in zip(combs, figsizes):
-        print(f"PC{comb[0]}-PC{comb[1]}")
+        display(Markdown(f"##### PC{comb[0]}-PC{comb[1]}"))
         k_max = len(ys) + 1
         k_mid = k_max//2 + 2
         fig, ax = plt.subplots(2, k_max//2, squeeze=squeeze, dpi=dpi, sharex=sharex, sharey=sharey,
@@ -313,6 +313,15 @@ def plot1(Z):
     """Plot the dendogram"""
     fig, ax = plt.subplots()
     dendrogram(Z, p=5, truncate_mode='level', get_leaves=True, ax=ax)
+    ax.set_title(f"Dendogram for ")
+    return ax
+
+
+def plot12(Z, type_):
+    """Plot the dendogram"""
+    fig, ax = plt.subplots()
+    dendrogram(Z, p=5, truncate_mode='level', get_leaves=True, ax=ax)
+    ax.set_title(f"Dendogram for {type_} linkage")
     return ax
 
 
@@ -366,7 +375,7 @@ def heirarch_cluster(combs, type_, dist_, df, df_reduced):
     plt.show()
 
     Z = linkage(df, method=type_, optimal_ordering=True)
-    plot1(Z)
+    plot12(Z, type_)
     plt.show()
 
     return cluster_labels
