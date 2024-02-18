@@ -313,7 +313,7 @@ def plot1(Z):
     """Plot the dendogram"""
     fig, ax = plt.subplots()
     dendrogram(Z, p=5, truncate_mode='level', get_leaves=True, ax=ax)
-    ax.set_title(f"Dendogram for ")
+    ax.set_title(f"Dendrogram for ")
     return ax
 
 
@@ -321,7 +321,7 @@ def plot12(Z, type_):
     """Plot the dendogram"""
     fig, ax = plt.subplots()
     dendrogram(Z, p=5, truncate_mode='level', get_leaves=True, ax=ax)
-    ax.set_title(f"Dendogram for {type_} linkage")
+    ax.set_title(f"Dendrogram for {type_} linkage")
     return ax
 
 
