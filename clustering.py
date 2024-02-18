@@ -343,6 +343,40 @@ def plot_internal(ax, inertias, chs, scs, dbs, gss, gssds):
     # ax2.legend(lines + lines2, labels + labels2, )
     return ax
 
+def plot_internal2(ax, inertias, chs, scs, dbs, gss, gssds, plot_dict):
+    """Plot internal validation values"""
+    ks = np.arange(2, len(inertias) + 2)
+    if plot_dict.get('sse'):
+        ax.plot(ks, inertias, "-o", label="SSE")
+    if plot_dict.get('ch'):
+        ax.plot(ks, chs, "-ro", label="CH")
+    ax.set_xlabel("$k$")
+    ax.set_ylabel("SSE/CH")
+    lines, labels = ax.get_legend_handles_labels()
+    ax2 = ax.twinx()
+    if plot_dict.get('gap'):
+        ax2.errorbar(ks, gss, gssds, fmt="-go", label="Gap statistic")
+    if plot_dict.get('sc'):
+        ax2.plot(ks, scs, "-ko", label="Silhouette coefficient")
+    if plot_dict.get('db'):
+        ax2.plot(ks, dbs, "-gs", label="DB")
+    ax2.set_ylabel("Gap statistic/Silhouette/DB")
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax2.legend(lines + lines2, labels + labels2, loc='center left', bbox_to_anchor=(1.15, 0.5))
+    # ax2.legend(lines + lines2, labels + labels2, )
+    return ax
+
+
+def plot_internal_ch(ax, inertias, chs,):
+    """Plot internal validation values"""
+    ks = np.arange(2, len(inertias) + 2)
+    ax.plot(ks, chs, "-ro", label="CH")
+    ax.set_xlabel("$k$")
+    ax.set_ylabel("SSE/CH")
+    lines, labels = ax.get_legend_handles_labels()
+    ax.legend(lines, labels, loc='center left', bbox_to_anchor=(1.15, 0.5))
+    return ax
+
 
 def get_kdist(k, data):
     """Get nearest neigbors"""
@@ -698,3 +732,21 @@ def display_pca_views(combs, df_reduced, cluster_labels):
 
 def format_with_commas(x):
     return '{:,.2f}'.format(x)
+
+
+def interactive_ivc(wid, res):
+    wid_ivc_dict = {}
+    for i in wid:
+        wid_ivc_dict.update({i: "show"})
+    fig, ax = plt.subplots()
+    plot_internal2(
+        ax,
+        res["inertias"],
+        res["chs"],
+        res["scs"],
+        res["dbs"],
+        res["gss"],
+        res["gssds"],
+        wid_ivc_dict
+    )
+    fig.show()
