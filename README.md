@@ -1,5 +1,21 @@
 DMW2 LAB 2025A LT5
 ***
+# London Fire Brigade Incident Records
+Latest version of dataset found here:
+https://data.london.gov.uk/dataset/london-fire-brigade-incident-records
+
+This project the team has done feature analysis on on this data set by using different clustering methods:
+- Representative Based
+  - K-Means
+- Agglomerative/Heirarchical Based
+  - Single Linkage
+  - Average Linkage
+  - Complete Linkage
+  - Ward's Method
+- Density-Based
+  - DBSCAN
+  - OPTICS
+
 # Setup Environment
 - Download python at and run installation:\
 https://www.python.org/downloads/
